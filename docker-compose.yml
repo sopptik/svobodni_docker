@@ -1,0 +1,39 @@
+version: '3.1'
+services:
+  db:
+    image: mysql/mysql-server
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: develrootpass
+      MYSQL_DATABASE: registr
+      MYSQL_USER: registr
+      MYSQL_PASSWORD: registr
+    ports:
+      - "3306:3306"      
+  registr:
+    build: ./party_registry
+    volumes:
+      # - ./party_registry/tmp:/tmp
+      - ./party_registry:/myapp
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+  vs:
+    build: ./ballot_box
+    volumes:
+      - ./ballot_box:/usr/src/app
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql      
